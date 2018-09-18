@@ -1,0 +1,45 @@
+#!/bin/bash
+
+# TODO: cmdline to 'save' (syncs)
+
+# TODO: sync git
+
+# TODO: should open up a tmux (NO, this should be the DE's job in a shortcut)
+
+DATA_DIR="." # NOTE: debug
+
+notesfolder="$DATA_DIR/session-notes"
+
+# ensure this computer has a folder in the notesfolder
+#if [ ! -d "$notesfolder/$HOSTNAME" ]; then
+	#mkdir $notesfolder/$HOSTNAME
+#fi
+
+# get user input
+echo -e "Press 'n' to create a new notes session, or the key combo in yellow below to open a previous session"
+
+read -p "Input: " -rn1 char1 
+if [[ "$char1" == "n" ]]; then
+	echo -e "\nCreating a new notes session"
+	
+	read -p "Session name: " name
+	echo $name
+
+	datestring=`date +"%Y.%m.%d"`
+	datetimestring=`date +'%Y.%m.%d %H:%M:%S'`
+
+	filename="${name}_${HOSTNAME}_${datestring}"
+	echo "$filename"
+	touch "$notesfolder/$filename"
+	
+	# TODO: sync git
+
+	echo -e "\n----- $datetimestring -----\n" >> $notesfolder/$filename
+
+	
+else 
+	echo $char1
+fi
+
+
+# TODO: sync git
