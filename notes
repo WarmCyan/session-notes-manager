@@ -1,5 +1,14 @@
 #!/bin/bash
 
+#declare -a references_double=('a','b','c','d','e','f','g','h','i','j','k','l','m','n','o','p','q','r','s','t','u','v','w','x','z')
+# references array
+declare -a references_single=("a" "d" "e" "f" "g" "h" "i" "j" "k" "l" "m" "o" "r" "s" "t" "u" "v" "w" "x")
+declare -a references_double=("a" "b" "c" "d" "e" "f" "g" "h" "i" "j" "k" "l" "m" "n" "o" "p" "q" "r" "s" "t" "u" "v" "w" "x" "z")
+
+declare -A references=(['']="hi")
+
+nextref=""
+
 # TODO: cmdline to 'sync' (syncs)
 
 # TODO: sync git
@@ -21,8 +30,36 @@ function inserttime
 	echo -e "\n----- $datetimestring -----\n" >> "$1"
 }
 
+function editfile
+{
+	nvim "+ normal Go" "$1"
+}
+
 # get user input
 echo -e "Press 'n' to create a new notes session, or the key combo in yellow below to open a previous session"
+
+# TODO: get file list
+doubleNeeded=false
+count=`ls $notesfolder -1q | wc -l`
+
+if [ $count -gt ${#references_single[@]} ]; then
+	doubleNeeded=true
+fi
+
+# iterate through each filename, print it out and store reference characters with it
+pushd $notesfolder &>/dev/null
+index=0
+for filename in `ls -t1q`; do
+	coloredname=`sed -E "s/(.*)_(.*)_(.*)/$(printf "$C_BLUE_L")\1$(printf "$C_RESET")\_\2\_\3/g" <<< "$filename"`
+
+	nextref="${references_single[$index]}"
+	references+=(["$nextref"]="$filename")
+	index=$index+1
+	
+	echo -e "$C_YELLOW_L$nextref $C_RESET$coloredname"
+done
+popd &>/dev/null
+
 
 read -p "Input: " -rn1 char1 
 if [[ "$char1" == "n" ]]; then
@@ -39,11 +76,15 @@ if [[ "$char1" == "n" ]]; then
 	
 	inserttime "$notesfolder/$filename"
 	
-	# TODO: sync git
+	# TODO: sync git?
 
-	nvim "+ normal Go" "$notesfolder/$filename"
+	editfile "$notesfolder/$filename"
 else 
 	echo $char1
+	filename=${references[$char1]}
+	echo "$filename"
+	inserttime "$notesfolder/$filename"
+	editfile "$notesfolder/$filename"
 fi
 
 
