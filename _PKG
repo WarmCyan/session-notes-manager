@@ -1,0 +1,3 @@
+install=notes>$BIN_DIR,|EXEC|$PKG_DIR/session-notes-manager/install.sh
+remove=notes<$BIN_DIR
+data=session-notes

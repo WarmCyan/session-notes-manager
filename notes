@@ -12,7 +12,7 @@ nextref=""
 # TODO: cmdline to 'sync' (syncs)
 
 
-DATA_DIR="." # NOTE: debug
+#DATA_DIR="." # NOTE: debug (local testing)
 
 notesfolder="$DATA_DIR/session-notes/notes"
 
@@ -117,5 +117,3 @@ else
 	git push
 	popd
 fi
-
-# TODO: sync git
