@@ -11,13 +11,15 @@ nextref=""
 
 # TODO: cmdline to 'sync' (syncs)
 
-# TODO: sync git
-
-# TODO: should open up a tmux (NO, this should be the DE's job in a shortcut)
 
 DATA_DIR="." # NOTE: debug
 
-notesfolder="$DATA_DIR/session-notes"
+notesfolder="$DATA_DIR/session-notes/notes"
+
+# sync git
+pushd $notesfolder &>/dev/null
+git pull
+popd
 
 # ensure this computer has a folder in the notesfolder
 #if [ ! -d "$notesfolder/$HOSTNAME" ]; then
@@ -35,10 +37,8 @@ function editfile
 	nvim "+ normal Go" "$1"
 }
 
-# get user input
 echo -e "Press 'n' to create a new notes session, or the key combo in yellow below to open a previous session"
 
-# TODO: get file list
 doubleNeeded=false
 count=`ls $notesfolder -1q | wc -l`
 
@@ -74,6 +74,7 @@ done
 popd &>/dev/null
 
 
+# get user input
 read -p "Input: " -rn1 char1 
 if [[ "$char1" == "n" ]]; then
 	echo -e "\nCreating a new notes session"
@@ -89,9 +90,14 @@ if [[ "$char1" == "n" ]]; then
 	
 	inserttime "$notesfolder/$filename"
 	
-	# TODO: sync git?
-
 	editfile "$notesfolder/$filename"
+	
+	# sync git stuff
+	pushd $notesfolder &>/dev/null
+	git add -A 
+	git commit -am "Added $filename"
+	git push
+	popd
 else 
 	referencestring="$char1"
 	
@@ -104,7 +110,12 @@ else
 	echo -e "\nOpening $filename..."
 	inserttime "$notesfolder/$filename"
 	editfile "$notesfolder/$filename"
+	
+	# sync git stuff
+	pushd $notesfolder &>/dev/null
+	git commit -am "Edited $filename"
+	git push
+	popd
 fi
-
 
 # TODO: sync git
