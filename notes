@@ -17,6 +17,7 @@ nextref=""
 notesfolder="$DATA_DIR/session-notes/notes"
 
 # sync git
+echo "Syncing notes..."
 pushd $notesfolder &>/dev/null
 git pull
 popd
@@ -93,6 +94,7 @@ if [[ "$char1" == "n" ]]; then
 	editfile "$notesfolder/$filename"
 	
 	# sync git stuff
+	echo "Syncing notes..."
 	pushd $notesfolder &>/dev/null
 	git add -A 
 	git commit -am "Added $filename"
@@ -112,6 +114,7 @@ else
 	editfile "$notesfolder/$filename"
 	
 	# sync git stuff
+	echo "Syncing notes..."
 	pushd $notesfolder &>/dev/null
 	git commit -am "Edited $filename"
 	git push
