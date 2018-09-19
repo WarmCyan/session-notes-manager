@@ -49,13 +49,26 @@ fi
 # iterate through each filename, print it out and store reference characters with it
 pushd $notesfolder &>/dev/null
 index=0
+subindex=0
 for filename in `ls -t1q`; do
 	coloredname=`sed -E "s/(.*)_(.*)_(.*)/$(printf "$C_BLUE_L")\1$(printf "$C_RESET")\_\2\_\3/g" <<< "$filename"`
 
-	nextref="${references_single[$index]}"
-	references+=(["$nextref"]="$filename")
-	index=$index+1
+	nextref=""
 	
+	if [ "$doubleNeeded" = 'true' ]; then
+		nextref="${references_single[$index]}${references_double[$subindex]}"
+		if [[ "$subindex" -ge "${#references_double[@]}" ]]; then
+			subindex=0
+			index=$index+1
+		else
+			subindex=$subindex+1
+		fi
+	else
+		nextref="${references_single[$index]}"
+		index=$index+1
+	fi
+	
+	references+=(["$nextref"]="$filename")
 	echo -e "$C_YELLOW_L$nextref $C_RESET$coloredname"
 done
 popd &>/dev/null
@@ -80,9 +93,15 @@ if [[ "$char1" == "n" ]]; then
 
 	editfile "$notesfolder/$filename"
 else 
-	echo $char1
-	filename=${references[$char1]}
-	echo "$filename"
+	referencestring="$char1"
+	
+	if [ "$doubleNeeded" = 'true' ]; then
+		read -rn1 char2
+		referencestring="$char1$char2"
+	fi
+		
+	filename=${references[$referencestring]}
+	echo -e "\nOpening $filename..."
 	inserttime "$notesfolder/$filename"
 	editfile "$notesfolder/$filename"
 fi
